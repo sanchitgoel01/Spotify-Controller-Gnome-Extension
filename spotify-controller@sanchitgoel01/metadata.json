@@ -1,0 +1,11 @@
+{
+  "description": "Control Spotify from the topbar!\n\nForked from https://github.com/koolskateguy89/gnome-shell-extension-spotify-controller .",
+  "name": "Spotify Controller",
+  "settings-schema": "org.gnome.shell.extensions.spotify-controller",
+  "shell-version": [
+    "40", "41"
+  ],
+  "url": "https://github.com/sanchitgoel01/Spotify-Controller-Gnome-Extension",
+  "uuid": "spotify-controller@sanchitgoel01",
+  "version": 6
+}

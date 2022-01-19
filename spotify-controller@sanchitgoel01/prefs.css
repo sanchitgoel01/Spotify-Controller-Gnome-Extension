@@ -1,0 +1,15 @@
+.pref-box {
+    border-width: 20px;
+}
+
+.color-grid {
+    margin: 12px;
+}
+
+.prefs-widget {
+    margin: 18px;
+}
+
+.pref-label {
+    font-weight: bold;
+}

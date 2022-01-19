@@ -39,34 +39,34 @@ function init() {
 
 function buildPrefsWidget() {
 
+    let provider = new Gtk.CssProvider();
+    provider.load_from_path(Me.dir.get_path() + '/prefs.css');
+    Gtk.StyleContext.add_provider_for_display(
+        Gdk.Display.get_default(),
+        provider,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+
     let box = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
-        border_width: 20,
         spacing: 1,
+        css_classes: [ 'pref-box' ]
     });
-
-    let title = new Gtk.Label({
-        label: '<b>' + Me.metadata.name + ' Extension Preferences</b>',
-        halign: Gtk.Align.START,
-        use_markup: true,
-        visible: true
-    });
-    box.add(title);
 
     let prefsWidget = new Gtk.Grid({
-        margin: 18,
+        css_classes: ['prefs-widget'],
         column_spacing: 12,
         row_spacing: 12,
         visible: true,
         column_homogeneous: true,
     });
-    box.add(prefsWidget);
+    box.append(prefsWidget);
 
     let index = 0;
 
 	/* left-padding */
     let leftPaddingLabel = new Gtk.Label({
         label: 'Left padding:',
+        css_classes: ['pref-label'],
         halign: Gtk.Align.START,
         visible: true
     });
@@ -77,6 +77,7 @@ function buildPrefsWidget() {
             upper: 200,
             step_increment: 1
         }),
+        hexpand: false,
         visible: true
     });
 
@@ -87,6 +88,7 @@ function buildPrefsWidget() {
     /* right-padding */
     let rightPaddingLabel = new Gtk.Label({
         label: 'Right padding:',
+        css_classes: ['pref-label'],
         halign: Gtk.Align.START,
         visible: true
     });
@@ -97,6 +99,7 @@ function buildPrefsWidget() {
             upper: 200,
             step_increment: 1
         }),
+        hexpand: false,
         visible: true
     });
 
@@ -130,7 +133,8 @@ function buildPrefsWidget() {
 
     /* extension-place */
     let extensionPlaceLabel = new Gtk.Label({
-        label: 'Extension place:',
+        label: 'Extension Location:',
+        css_classes: ['pref-label'],
         halign: Gtk.Align.START,
         visible: true
     });
@@ -150,7 +154,8 @@ function buildPrefsWidget() {
 
     /* extension-index */
     let extensionIndexLabel = new Gtk.Label({
-        label: 'Extension index:',
+        label: 'Extension Index',
+        css_classes: ['pref-label'],
         halign: Gtk.Align.START,
         visible: true
     });
@@ -159,8 +164,9 @@ function buildPrefsWidget() {
         adjustment: new Gtk.Adjustment({
             lower: 0,
             upper: 20,
-            step_increment: 1
+            step_increment: 1,
         }),
+        hexpand: false,
         visible: true
     });
 
@@ -172,6 +178,7 @@ function buildPrefsWidget() {
     /* show-inactive */
     let showInactiveLabel = new Gtk.Label({
         label: 'Show when Spotify is closed:',
+        css_classes: ['pref-label'],
         halign: Gtk.Align.START,
         visible: true
     });
@@ -186,6 +193,23 @@ function buildPrefsWidget() {
     prefsWidget.attach(showInactiveLabel, 0, index, 1, 1);
     prefsWidget.attach(showInactiveSwitch, 1, index, 1, 1);
 
+    /* show song */
+    let showSongLabel = new Gtk.Label({
+        label: 'Show Song: ',
+        css_classes: ['pref-label'],
+        halign: Gtk.Align.START,
+        visible: true
+    });
+
+    let showSongSwitch = new Gtk.Switch({
+        valign: Gtk.Align.END,
+        halign: Gtk.Align.END,
+        visible: true
+    });
+
+    index++;
+    prefsWidget.attach(showSongLabel, 0, index, 1, 1);
+    prefsWidget.attach(showSongSwitch, 1, index, 1, 1);
 
     /* *-icon-color */
     let colorGrid = buildColorGrid();
@@ -201,12 +225,11 @@ function buildPrefsWidget() {
     }));
     settings.bind('extension-index', extensionIndexEntry, 'value', Gio.SettingsBindFlags.DEFAULT);
     settings.bind('show-inactive', showInactiveSwitch, 'active', Gio.SettingsBindFlags.DEFAULT);
+    settings.bind('show-song', showSongSwitch, 'active', Gio.SettingsBindFlags.DEFAULT);
 
 
     let defaultButton = buildDefaultButton();
-    box.pack_end(defaultButton, false, false, 0);
-
-    box.show_all();
+    box.append(defaultButton);
 
     return box;
 }
@@ -214,7 +237,7 @@ function buildPrefsWidget() {
 function buildColorGrid() {
 
     let colorGrid = new Gtk.Grid({
-        margin: 12,
+        css_classes: [ 'color-grid' ],
         column_spacing: 12,
         row_spacing: 12,
         visible: true,
@@ -228,11 +251,13 @@ function buildColorGrid() {
         halign: Gtk.Align.START,
         visible: true,
     });
-
+    
     prevColorButton = new Gtk.ColorButton({
         visible: true,
     });
-    prevColorButton.set_color(Gdk.Color.parse(settings.get_string('prev-icon-color'))[1]);
+    let prevBtnColor = new Gdk.RGBA();
+    prevBtnColor.parse(settings.get_string('prev-icon-color'));
+    prevColorButton.set_rgba(prevBtnColor);
 
     colorGrid.attach(prevColorLabel, 0, 0, 1, 1);
     colorGrid.attach(prevColorButton, 1, 0, 1, 1);
@@ -248,7 +273,9 @@ function buildColorGrid() {
     nextColorButton = new Gtk.ColorButton({
         visible: true,
     });
-    nextColorButton.set_color(Gdk.Color.parse(settings.get_string('next-icon-color'))[1]);
+    let nextBtnColor = new Gdk.RGBA();
+    nextBtnColor.parse(settings.get_string('next-icon-color'));
+    nextColorButton.set_rgba(nextBtnColor);
 
     colorGrid.attach(nextColorLabel, 0, 1, 1, 1);
     colorGrid.attach(nextColorButton, 1, 1, 1, 1);
@@ -261,10 +288,10 @@ function buildColorGrid() {
         visible: true,
     });
 
-    pauseColorButton = new Gtk.ColorButton({
-        visible: true,
-    });
-    pauseColorButton.set_color(Gdk.Color.parse(settings.get_string('pause-icon-color'))[1]);
+    let pauseBtnColor = new Gdk.RGBA();
+    pauseBtnColor.parse(settings.get_string('pause-icon-color'));
+
+    pauseColorButton = Gtk.ColorButton.new_with_rgba(pauseBtnColor);
 
     colorGrid.attach(pauseColorLabel, 0, 2, 1, 1);
     colorGrid.attach(pauseColorButton, 1, 2, 1, 1);
@@ -277,75 +304,58 @@ function buildColorGrid() {
         visible: true,
     });
 
-    playColorButton = new Gtk.ColorButton({
-        visible: true,
-    });
-    playColorButton.set_color(Gdk.Color.parse(settings.get_string('play-icon-color'))[1]);
+    let playBtnColor = new Gdk.RGBA();
+    playBtnColor.parse(settings.get_string('play-icon-color'));
+    playColorButton = Gtk.ColorButton.new_with_rgba(playBtnColor);
 
     colorGrid.attach(playColorLabel, 0, 3, 1, 1);
     colorGrid.attach(playColorButton, 1, 3, 1, 1);
 
 
     prevColorButton.connect('color-set', Lang.bind(this, function(widget) {
-        const color = widget.get_color().to_string();
-        prevColorLabel.label = `[${parseHex(color)}]`;    // for debug
-        settings.set_string('prev-icon-color', parseHex(color));
+        const color = widget.get_rgba().to_string();
+        settings.set_string('prev-icon-color', color);
     }));
 
     nextColorButton.connect('color-set', Lang.bind(this, function(widget) {
-        const color = widget.get_color().to_string();
-        settings.set_string('next-icon-color', parseHex(color));
+        const color = widget.get_rgba().to_string();
+        settings.set_string('next-icon-color', color);
     }));
 
     pauseColorButton.connect('color-set', Lang.bind(this, function(widget) {
-        const color = widget.get_color().to_string();
-        settings.set_string('pause-icon-color', parseHex(color));
+        const color = widget.get_rgba().to_string();
+        settings.set_string('pause-icon-color', color);
     }));
 
     playColorButton.connect('color-set', Lang.bind(this, function(widget) {
-        const color = widget.get_color().to_string();
-        settings.set_string('play-icon-color', parseHex(color));
+        const color = widget.get_rgba().to_string();
+        settings.set_string('play-icon-color', color);
     }));
 
 
     return colorGrid;
 }
 
-// parse 12-digit hex (given by Gdk.Color) to 6-digit needed for CSS - some accuracy WILL be lost
-function parseHex(hex = '#000000') {
-    if (hex.length == 7)
-        return hex;
+// Convert rgba to hex string
+function rgbaToHex(color) {
+    var a,
+    rgb = orig.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i),
+    alpha = (rgb && rgb[4] || "").trim(),
+    hex = rgb ?
+    (rgb[1] | 1 << 8).toString(16).slice(1) +
+    (rgb[2] | 1 << 8).toString(16).slice(1) +
+    (rgb[3] | 1 << 8).toString(16).slice(1) : orig;
 
-    // split color into its constituent parts
-    var red = hex.substring(1, 5);
-    var green = hex.substring(5, 9);
-    var blue = hex.substring(9);
+  if (alpha !== "") {
+    a = alpha;
+  } else {
+    a = 01;
+  }
+  // multiply before convert to HEX
+  a = ((a * 255) | 1 << 8).toString(16).slice(1)
+  hex = hex + a;
 
-    // convert hex strings to ints
-    red = parseInt(red, 16);
-    green = parseInt(green, 16);
-    blue = parseInt(blue, 16);
-
-    // divide by 16^2 to try and 'simulate' 16^4 bits -> 16^2 bits
-    red = Math.floor(red / 256);
-    green = Math.floor(green / 256);
-    blue = Math.floor(blue / 256);
-
-    // convert back to hex strings
-    red = red.toString(16);
-    green = green.toString(16);
-    blue = blue.toString(16);
-
-    // 'inflate' single digit hex
-    if (red.length < 2)
-        red = '0' + red;
-    if (green.length < 2)
-        green = '0' + green;
-    if (blue.length < 2)
-        blue = '0' + blue;
-
-
-    return `#${red}${green}${blue}`;
+  return hex;
 }
 
 function buildDefaultButton() {
@@ -362,12 +372,13 @@ function buildDefaultButton() {
 
         settings.set_boolean('show-inactive', false);
 
-        const white = Gdk.Color.parse('white')[1];
+        const white = new Gdk.RGBA();
+        white.parse('white');
 
-        prevColorButton.set_color(white); prevColorButton.emit('color-set');
-        nextColorButton.set_color(white); nextColorButton.emit('color-set');
-        pauseColorButton.set_color(white); pauseColorButton.emit('color-set');
-        playColorButton.set_color(white); playColorButton.emit('color-set');
+        prevColorButton.set_rgba(white); prevColorButton.emit('color-set');
+        nextColorButton.set_rgba(white); nextColorButton.emit('color-set');
+        pauseColorButton.set_rgba(white); pauseColorButton.emit('color-set');
+        playColorButton.set_rgba(white); playColorButton.emit('color-set');
     });
 
     return button;

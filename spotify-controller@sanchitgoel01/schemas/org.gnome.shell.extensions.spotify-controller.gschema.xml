@@ -28,6 +28,9 @@
       <default>false</default>
     </key>
 
+    <key name="show-song" type="b">
+      <default>true</default>
+    </key>
 
     <key name="prev-icon-color" type="s">
       <default>'white'</default>
