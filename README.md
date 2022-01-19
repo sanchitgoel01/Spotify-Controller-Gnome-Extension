@@ -2,17 +2,14 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-**This extension is a fork of [gnome-shell-extension-spotify-controller](https://github.com/koolskateguy89/gnome-shell-extension-spotify-controller)**
+**This extension is a fork of [gnome-shell-extension-spotify-controller](https://github.com/koolskateguy89/gnome-shell-extension-spotify-controller)**. Credit for the original code belongs to the respective owners and contributers.
 
-**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
 
+- [Features](#features)
 - [Installation](#installation)
 - [Prerequisites](#prerequisites)
 - [License](#license)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Features
 * Playback Controls: Skip, pause, or go back a track from the convenience of the top bar.
@@ -53,7 +50,7 @@ Currently, this extension requires manual installation:
 
 - **Enable the extension**
 
-  `gnome-shell-extension-prefs` (deprecated but works for now) then enable 'Spotify Controller'
+  `gnome-extensions-app` then enable 'Spotify Controller'
 
 If you copied the extension, you can delete the repo folder (`cd .. && rm -r gnome-shell-extension-spotify-controller`)
 
