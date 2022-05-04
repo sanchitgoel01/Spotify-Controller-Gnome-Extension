@@ -177,7 +177,7 @@ function unwatchProcess(watchId) {
   Gio.bus_unwatch_name(watchId);
 }
 
-let propertiesWatcher = new Object();
+var propertiesWatcher = {};
 Signals.addSignalMethods(propertiesWatcher);
 
 _playbackStatusCached = null;
