@@ -177,7 +177,7 @@ function unwatchProcess(watchId) {
   Gio.bus_unwatch_name(watchId);
 }
 
-var propertiesWatcher = {};
+let propertiesWatcher = new Object();
 Signals.addSignalMethods(propertiesWatcher);
 
 _playbackStatusCached = null;
@@ -201,19 +201,25 @@ function connectPropertiesWatcher() {
 
   _handlerId = _spotifyDataProxy.connectSignal('PropertiesChanged', (proxy, nameOwner, args) => {
     let output = args[1];
-    let playbackStatus = output.PlaybackStatus.unpack();
-    let isPlaying = playbackStatus == "Playing";
-    if (isPlaying != _playbackStatusCached) {
-      _playbackStatusCached = isPlaying;
-      propertiesWatcher.emit('changed:PlaybackStatus', isPlaying);
+
+    // PropertiesChanged signal alternates between including Playback or including Metadata
+    if (output.PlaybackStatus) {
+      let playbackStatus = output.PlaybackStatus.unpack();
+      let isPlaying = playbackStatus == "Playing";
+      if (isPlaying != _playbackStatusCached) {
+        _playbackStatusCached = isPlaying;
+        propertiesWatcher.emit('changed:PlaybackStatus', isPlaying);
+      }
     }
 
-    let metadata = output.Metadata.unpack();
-    /** @type {string} */
-    let song = _convertMetadataToSong(metadata);
-    if (_songCached == null || song.title != _songCached.title) {
-      _songCached = song;
-      propertiesWatcher.emit('changed:Song', song);
+    if (output.Metadata) {
+      let metadata = output.Metadata.unpack();
+      /** @type {string} */
+      let song = _convertMetadataToSong(metadata);
+      if (_songCached == null || song.title != _songCached.title) {
+        _songCached = song;
+        propertiesWatcher.emit('changed:Song', song);
+      }
     }
   });
 }
